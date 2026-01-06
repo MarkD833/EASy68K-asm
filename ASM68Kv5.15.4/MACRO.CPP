@@ -102,6 +102,7 @@ int macro(int size, char *label, char *op, int *errorPtr)
 
   // move file pointer past ENDM directive
   while(fgets(line, 256, inFile)) {
+    REMOVECR(line);           // MD Strip out CR here too
     if (pass == 0)
       fprintf(tmpFile, "%s", line);           // write macro line to tmpFile // RA warning: format not a string literal and no format arguments
     lineNum++;
