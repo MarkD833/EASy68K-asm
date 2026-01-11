@@ -415,9 +415,15 @@ int assemble(char *line, int *errorPtr)
        strcap(capLine, line);
     else
        {
-         //fprintf(listFile,"found INCLUDE or INCLUDEBIN, copying line to: %s :::\n",line); // RA debug
-         strncpy(capLine, line, 255);
-       }
+        //fprintf(listFile,"found INCLUDE or INCLUDEBIN, copying line to: %s :::\n",line); // RA debug
+        strncpy(capLine, line, 255);
+
+        // MD Check for Windows backslash and replace with forward slash
+        for (int i = 0; capLine[i] != '\0'; i++) {
+          if (capLine[i] == '\\') capLine[i] = '/';
+        }
+
+     }
 
     p = skipSpace(capLine);               // skip leading white space
     tokenize(capLine, (char *)", \t\n\r", token, tokens); // RA // tokenize line
@@ -436,7 +442,7 @@ int assemble(char *line, int *errorPtr)
 
     // conditional assembly for all code
 
-    // DEBUG //fprintf(listFile,"tokens 0 1 2 3  :::(%s):: :::(%s)::: :::(%s)::: :::(%s):::\n",token[0], token[1], token[2], token[3]); //RA debug
+    // DEBUG // 	fprintf(listFile,"tokens 0 1 2 3  :::(%s):: :::(%s)::: :::(%s)::: :::(%s):::\n",token[0], token[1], token[2], token[3]); //RA debug
    
     // ----- IFC -----
     if(!(stricmp(token[1], "IFC"))) {       // if IFC opcode

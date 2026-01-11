@@ -241,6 +241,8 @@ int printError(FILE *outFile, int errorCode, int lineNum)
     listError(numBuf, buffer);  // add error to listing file
 
   // display error messages in edit window
+  // MD direct error message to console
+  fprintf(stderr,"%s %s",numBuf, buffer);
 
   // if include file then display error in proper window
   if (includeFile[0]) {         // if not NULL
