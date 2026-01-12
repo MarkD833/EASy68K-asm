@@ -1016,7 +1016,9 @@ int main(int argc, char *argv[])
           unlink(tempFile.c_str());
 
           if (s==SEVERE) exit(1); // RA - returns NULL, corrected to SEVERE on failure as some return status 0 for NORMAL!
-          if (!s) exit(1); 
+          if (s!=0) exit(1);  // MD tweaked this
+
   }
+  return 0;     // MD return zero on success - keeps MAKE happy
 }
 #endif
