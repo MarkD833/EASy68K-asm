@@ -1019,6 +1019,11 @@ int main(int argc, char *argv[])
           if (s!=0) exit(1);  // MD tweaked this
 
   }
+  // MD return non-zero if there were errors or warnings
+  if ((errorCount!=0) || (warningCount!=0)) {
+    fprintf(stderr,"%d Error(s) and %d Warning(s)\n",errorCount,warningCount);
+    return 1;
+  }
   return 0;     // MD return zero on success - keeps MAKE happy
 }
 #endif
