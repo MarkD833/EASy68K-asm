@@ -22,7 +22,6 @@
 // include <system.hpp>
 // include <process.h>
 #include <stdlib.h>
-#include <malloc.h>
 // include <vcl.h>
 //---- added by RA----
 #include <iostream>
