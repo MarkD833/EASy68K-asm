@@ -57,7 +57,7 @@ void clearSymbols()
   symbolInit = false;
   }
   catch( ... ) {
-    sprintf(buffer, "ERROR: An exception occurred in routine 'clearSymbols'. \n");
+    snprintf(buffer, sizeof(buffer), "ERROR: An exception occurred in routine 'clearSymbols'. \n");
     printError(NULL, EXCEPTION, 0);
   }
 }
@@ -173,7 +173,7 @@ symbolDef *lookup(char *sym, int create, int *errorPtr)
   }
   catch( ... ) {
     NEWERROR(*errorPtr, EXCEPTION);
-    sprintf(buffer, "ERROR: An exception occurred in routine 'lookup'. \n");
+    snprintf(buffer, sizeof(buffer), "ERROR: An exception occurred in routine 'lookup'. \n");
     return NULL;
   }
   return t;

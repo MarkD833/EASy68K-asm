@@ -116,7 +116,7 @@ int effAddr(opDescriptor *operand)
   if (operand->mode == IMMEDIATE)
     return 0x3C;
 
-  sprintf(buffer,"INVALID EFFECTIVE ADDRESSING MODE!\n");
+  snprintf(buffer, sizeof(buffer),"INVALID EFFECTIVE ADDRESSING MODE!\n");
   //Application->MessageBox(buffer, "Error", MB_OK);
     fprintf(stderr,"%s\n",buffer);
   exit (0);
@@ -200,7 +200,7 @@ int extWords(opDescriptor *op, int size, int *errorPtr)
       loc += 4;
     }
   } else {
-    sprintf(buffer,"INVALID EFFECTIVE ADDRESSING MODE!\n");
+    snprintf(buffer, sizeof(buffer),"INVALID EFFECTIVE ADDRESSING MODE!\n");
    //Application->MessageBox(buffer, "Error", MB_OK);
      fprintf(stderr,"%s\n",buffer);
    return MILD_ERROR;

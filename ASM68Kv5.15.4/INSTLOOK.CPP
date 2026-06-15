@@ -141,7 +141,7 @@ char *instLookup(char *p, instruction *(*instPtrPtr), char *sizePtr, int *errorP
   }
   catch( ... ) {
     NEWERROR(*errorPtr, EXCEPTION);
-    sprintf(buffer, "ERROR: An exception occurred in routine 'instLookup'. \n");
+    snprintf(buffer, sizeof(buffer), "ERROR: An exception occurred in routine 'instLookup'. \n");
     return NULL;
   }
   //return NORMAL;

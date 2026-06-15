@@ -435,7 +435,7 @@ char *opParse(char *p, opDescriptor *d, int *errorPtr)
   }
   catch( ... ) {
     NEWERROR(*errorPtr, EXCEPTION);
-    sprintf(buffer, "ERROR: An exception occurred in routine 'opParse'. \n");
+    snprintf(buffer, sizeof(buffer), "ERROR: An exception occurred in routine 'opParse'. \n");
     return NULL;
   }
 

@@ -131,7 +131,7 @@ int initObj(char *name)
 {
   objFile = fopen(name, "w");
   if (!objFile) {
-    sprintf(buffer,"Unable to create S-Record file");
+    snprintf(buffer, sizeof(buffer), "Unable to create S-Record file");
     //Application->MessageBox(buffer, "Error", MB_OK);
       fprintf(stderr,"%s\n",buffer);
     return MILD_ERROR;
@@ -185,13 +185,13 @@ int outputObj(int newAddr, int data, int size)
     // If no S-record is already being assembled, then start making one
     if (!lineFlag) {
       if ((newAddr & 0xFFFF) == newAddr) {
-	sprintf(sRecord, "S1  %04X", newAddr);
+	snprintf(sRecord, sizeof(sRecord), "S1  %04X", newAddr);
 	obyteCount = 3;
       }	else if ((newAddr & 0xFFFFFF) == newAddr) {
-	sprintf(sRecord, "S2  %06X", (int) newAddr); //RA
+	snprintf(sRecord, sizeof(sRecord), "S2  %06X", (int) newAddr); //RA
 	obyteCount = 4;
       }	else {
-	sprintf(sRecord, "S3  %08X", newAddr); //RA warning: format ‘%lX’ expects argument of type ‘long unsigned int’, but argument 3 has type ‘int’
+	snprintf(sRecord, sizeof(sRecord), "S3  %08X", newAddr); //RA warning: format ‘%lX’ expects argument of type ‘long unsigned int’, but argument 3 has type ‘int’
 	obyteCount = 5;
       }
       objPtr = sRecord + 4 + (obyteCount-1)*2;
@@ -203,20 +203,20 @@ int outputObj(int newAddr, int data, int size)
     switch (size) {
       case BYTE_SIZE :
         data &= 0xFF;
-	sprintf(objPtr, "%02X", data);
+	snprintf(objPtr, sizeof(sRecord)-(objPtr-sRecord), "%02X", data);
 	obyteCount++;
 	break;
       case WORD_SIZE :
         data &= 0xFFFF;
-	sprintf(objPtr, "%04X", data);
+	snprintf(objPtr, sizeof(sRecord)-(objPtr-sRecord), "%04X", data);
 	obyteCount += 2;
 	break;
       case LONG_SIZE :
-        sprintf(objPtr, "%08X", data); // RA
+        snprintf(objPtr, sizeof(sRecord)-(objPtr-sRecord), "%08X", data); // RA
 	obyteCount += 4;
 	break;
       default :
-        sprintf(buffer,"outputObj: INVALID SIZE CODE!\n");
+        snprintf(buffer, sizeof(buffer), "outputObj: INVALID SIZE CODE!\n");
         //Application->MessageBox(buffer, "Error", MB_OK);
           fprintf(stderr,"%s\n",buffer);
 	return MILD_ERROR;
@@ -225,7 +225,7 @@ int outputObj(int newAddr, int data, int size)
     objAddr += (int) size;
   }
   catch( ... ) {
-    sprintf(buffer, "ERROR: An exception occurred in routine 'initObj'. \n");
+    snprintf(buffer, sizeof(buffer), "ERROR: An exception occurred in routine 'initObj'. \n");
     printError(NULL, EXCEPTION, 0);
     return MILD_ERROR;
   }
@@ -241,7 +241,7 @@ int writeObj()
 
   try {
     // Fill in the record length (including the checksum in the record length
-    sprintf(recLen, "%02X", obyteCount);
+    snprintf(recLen, sizeof(recLen), "%02X", obyteCount);
     sRec += 2;          // point to byte count location
     strncpy(sRec, recLen, 2);
 
@@ -254,19 +254,19 @@ int writeObj()
 //      checksum += (char) (StrToInt(str) & 0xFF); //RA
       checksum += (char) (strtol(str.c_str(), NULL, 0) & 0xFF); //RA
     }
-    sprintf(sRec, "%02X\n", (~checksum & 0xFF)); // put checksum in sRecord
+    snprintf(sRec, sizeof(sRecord) - (sRec - sRecord), "%02X\n", (~checksum & 0xFF)); // put checksum in sRecord
 
     // Output the S-record to the object file
     fputs(sRecord, objFile);
     if (ferror(objFile)) {
-      sprintf(buffer,"%s",objErrorMsg); //RA warning: format not a string literal and no format arguments
+      snprintf(buffer, sizeof(buffer), "%s",objErrorMsg); //RA warning: format not a string literal and no format arguments
       //Application->MessageBox(buffer, "Error", MB_OK);
         fprintf(stderr,"%s\n",buffer);
       return MILD_ERROR;
     }
   }
   catch( ... ) {
-    sprintf(buffer, "ERROR: An exception occurred in routine 'writeObj'. \n");
+    snprintf(buffer, sizeof(buffer), "ERROR: An exception occurred in routine 'writeObj'. \n");
     printError(NULL, EXCEPTION, 0);
     return MILD_ERROR;
   }
@@ -289,27 +289,27 @@ int writeMap(char* name, int start, int end)
     obyteCount = 3;
     objPtr = sRecord + 4 + (obyteCount-1)*2;
 
-    sprintf(objPtr, "%s", name); // RA
+    snprintf(objPtr, sizeof(sRecord)-(objPtr-sRecord), "%s", name); // RA
     objPtr += 20;
     obyteCount += 10;
     snprintf(data, 7, "%06X", start & 0x00ffffff); // RA GCC will complain about truncation here even though it shouldn't :(
     for (int i=0; i<6; i++) {                     // ^ also warning: ‘sprintf’ writing a terminating nul past the end of the destination
-      sprintf(objPtr, "%02X", data[i]);
+      snprintf(objPtr, sizeof(sRecord)-(objPtr-sRecord), "%02X", data[i]);
       objPtr += 2;
     }
     obyteCount += 6;
-    sprintf(objPtr, "2C");                    // ","
+    snprintf(objPtr, sizeof(sRecord)-(objPtr-sRecord), "2C");                    // ","
     objPtr += 2;
     obyteCount += 1;
     snprintf(data, 7, "%06X", end & 0x00ffffff);
     for (int i=0; i<6; i++) {
-      sprintf(objPtr, "%02X", data[i]);
+      snprintf(objPtr, sizeof(sRecord)-(objPtr-sRecord), "%02X", data[i]);
       objPtr += 2;
     }
     obyteCount += 6;
   }
   catch( ... ) {
-    sprintf(buffer, "ERROR: An exception occurred in routine 'writeMap'. \n");
+    snprintf(buffer, sizeof(buffer), "ERROR: An exception occurred in routine 'writeMap'. \n");
     printError(NULL, EXCEPTION, 0);
     return MILD_ERROR;
   }
@@ -347,13 +347,13 @@ int finishObj()
     // Write out a S8 record and close the file
     // S8 Record. The address field contains a 3-byte starting execution address.
     // There is no data field.
-    sprintf(sRecord, "S8  %06X", startAddress);
+    snprintf(sRecord, sizeof(sRecord), "S8  %06X", startAddress);
     obyteCount = 4;
     objPtr = sRecord + 4 + (obyteCount-1)*2;
     writeObj();
 
     if (ferror(objFile)) {
-      sprintf(buffer, "%s", objErrorMsg); // RA warning: format not a string literal and no format arguments
+      snprintf(buffer, sizeof(buffer), "%s", objErrorMsg); // RA warning: format not a string literal and no format arguments
       //Application->MessageBox(buffer, "Error", MB_OK);
         fprintf(stderr,"%s\n",buffer);
       return MILD_ERROR;
@@ -363,7 +363,7 @@ int finishObj()
   }
   catch( ... ) {
     fclose(objFile);
-    sprintf(buffer, "ERROR: An exception occurred in routine 'finishObj'. \n");
+    snprintf(buffer, sizeof(buffer), "ERROR: An exception occurred in routine 'finishObj'. \n");
     printError(NULL, EXCEPTION, 0);
     return MILD_ERROR;
   }

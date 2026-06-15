@@ -74,7 +74,7 @@ extern int lineNum;
 extern int lineNumL68;
 
 //static
- char listData[49];      /* Buffer in which listing lines are assembled */
+char listData[LIST_DATA_BUFFER_SIZE];      /* Buffer in which listing lines are assembled */
 
 extern char *listPtr;	       /* Pointer to above buffer (this pointer is
 				  global because it is actually manipulated
@@ -96,7 +96,7 @@ int initList(char *name)
     createdL68 = false;
     listFile = fopen(name, "w");
     if (!listFile) {
-      sprintf(buffer,"Unable to create listing file");
+      snprintf(buffer, sizeof(buffer),"Unable to create listing file");
       //Application->MessageBox(buffer, "Error", MB_OK);
         fprintf(stderr,"%s\n",buffer);
       return MILD_ERROR;
@@ -126,7 +126,7 @@ int initList(char *name)
     return NORMAL;
   }
   catch( ... ) {
-    sprintf(buffer, "ERROR: An exception occurred in routine 'initList'. \n");
+    snprintf(buffer, sizeof(buffer), "ERROR: An exception occurred in routine 'initList'. \n");
     printError(NULL, EXCEPTION, 0);
     return MILD_ERROR;
   }
@@ -174,7 +174,7 @@ int listLine(char text[], char lineIdent[])   // ck 4-2006 lineIdent[]
       putc('\n', listFile);
 
     if (ferror(listFile)) {
-      sprintf(buffer,"Error writing to listing file\n");
+      snprintf(buffer, sizeof(buffer),"Error writing to listing file\n");
       //Application->MessageBox(buffer, "Error", MB_OK);
         fprintf(stderr,"%s\n",buffer);
       return MILD_ERROR;
@@ -182,7 +182,7 @@ int listLine(char text[], char lineIdent[])   // ck 4-2006 lineIdent[]
     lineNumL68++;
   }
   catch( ... ) {
-    sprintf(buffer, "ERROR: An exception occurred in routine 'listLine'. \n");
+    snprintf(buffer, sizeof(buffer), "ERROR: An exception occurred in routine 'listLine'. \n");
     printError(NULL, EXCEPTION, 0);
     return MILD_ERROR;
   }
@@ -196,9 +196,9 @@ int listLoc()
   if (!listPtr) listPtr=listData; // prevent crash RA
 
   if (offsetMode || showEqual)
-    sprintf(listData, "%08X= ", loc); //RA warning: format ‘%lX’ expects argument of type ‘long unsigned int’, but argument 3 has type ‘int’
+    snprintf(listData, sizeof(listData), "%08X= ", loc); //RA warning: format ‘%lX’ expects argument of type ‘long unsigned int’, but argument 3 has type ‘int’
   else
-    sprintf(listData, "%08X  ", loc); // RA
+    snprintf(listData, sizeof(listData), "%08X  ", loc); // RA
   listPtr = listData + 10;
 
   return NORMAL;
@@ -210,9 +210,9 @@ int listCond(bool cond)
 {
   if (!listPtr) listPtr=listData; // prevent crash RA
   if (cond)
-    sprintf(listPtr,"               %s ","FALSE");
+    snprintf(listPtr, sizeof(listData) - (listPtr - listData),"               %s ","FALSE");
   else
-    sprintf(listPtr,"               %s ","TRUE");
+    snprintf(listPtr, sizeof(listData) - (listPtr - listData),"               %s ","TRUE");
 
   return NORMAL;
 }
@@ -251,16 +251,16 @@ int listObj(int data, int size)
     continuation = true;
   }
   switch (size) {
-    case BYTE_SIZE: sprintf(listPtr, "%02X ", (unsigned int)(data & 0xFF)); // RA 
+    case BYTE_SIZE: snprintf(listPtr, sizeof(listData) - (listPtr - listData), "%02X ", (unsigned int)(data & 0xFF)); // RA
       listPtr += 3;
       break;
-    case WORD_SIZE: sprintf(listPtr, "%04X ", (unsigned int)(data & 0xFFFF)); // RA
+    case WORD_SIZE: snprintf(listPtr, sizeof(listData) - (listPtr - listData), "%04X ", (unsigned int)(data & 0xFFFF)); // RA
       listPtr += 5;
       break;
-    case LONG_SIZE: sprintf(listPtr, "%08X ", data); // RA
+    case LONG_SIZE: snprintf(listPtr, sizeof(listData) - (listPtr - listData), "%08X ", data); // RA
       listPtr += 9;
       break;
-    default: sprintf(buffer,"LISTOBJ: INVALID SIZE CODE!\n");
+    default: snprintf(buffer, sizeof(buffer),"LISTOBJ: INVALID SIZE CODE!\n");
       //Application->MessageBox(buffer, "Error", MB_OK);
         fprintf(stderr,"%s\n",buffer);
       return MILD_ERROR;
@@ -303,7 +303,7 @@ int finishList()
   }
   catch( ... ) {
     fclose(listFile);
-    sprintf(buffer, "ERROR: An exception occurred in routine 'finishList'. \n");
+    snprintf(buffer, sizeof(buffer), "ERROR: An exception occurred in routine 'finishList'. \n");
     printError(NULL, EXCEPTION, 0);
     return MILD_ERROR;
   }

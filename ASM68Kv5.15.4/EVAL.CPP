@@ -171,7 +171,7 @@ char *eval(char	*p, int *valuePtr, bool *refPtr, int *errorPtr)
   }
   catch( ... ) {
     NEWERROR(*errorPtr, EXCEPTION);
-    sprintf(buffer, "ERROR: An exception occurred in routine 'eval'. \n");
+    snprintf(buffer, sizeof(buffer), "ERROR: An exception occurred in routine 'eval'. \n");
     return NULL;
   }
 
@@ -361,7 +361,7 @@ char *evalNumber(char *p, int *numberPtr, bool *refPtr, int *errorPtr)
   }
   catch( ... ) {
     NEWERROR(*errorPtr, EXCEPTION);
-    sprintf(buffer, "ERROR: An exception occurred in routine 'evalNumber'. \n");
+    snprintf(buffer, sizeof(buffer), "ERROR: An exception occurred in routine 'evalNumber'. \n");
     return NULL;
   }
 

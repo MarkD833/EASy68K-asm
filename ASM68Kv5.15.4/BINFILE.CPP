@@ -60,7 +60,7 @@ int initBin(char *name)
 {
   binFile = fopen(name, "wb");  // create binary file
   if (!binFile) {
-    sprintf(buffer,"Unable to create binary file!");
+    snprintf(buffer, sizeof(buffer),"Unable to create binary file!");
     //Application->MessageBox(buffer, "Error", MB_OK);
       fprintf(stderr,"%s\n",buffer);
     return MILD_ERROR;
@@ -138,7 +138,7 @@ int outputBin(int newAddr, int data, int size)
 
   }
   catch( ... ) {
-    sprintf(buffer, "ERROR: An exception occurred in routine 'outputBin'. \n");
+    snprintf(buffer, sizeof(buffer), "ERROR: An exception occurred in routine 'outputBin'. \n");
     printError(NULL, EXCEPTION, 0);
     return MILD_ERROR;
   }
@@ -171,7 +171,7 @@ int finishBin()
   fclose(binFile);
   }
   catch( ... ) {
-    sprintf(buffer, "ERROR: An exception occurred in routine 'finishBin'. \n");
+    snprintf(buffer, sizeof(buffer), "ERROR: An exception occurred in routine 'finishBin'. \n");
     printError(NULL, EXCEPTION, 0);
     return MILD_ERROR;
   }
@@ -201,7 +201,7 @@ void writeBigEndian(int data, int size)
   }
   }
   catch( ... ) {
-    sprintf(buffer, "ERROR: An exception occurred in routine 'writeBigEndian'. \n");
+    snprintf(buffer, sizeof(buffer), "ERROR: An exception occurred in routine 'writeBigEndian'. \n");
     printError(NULL, EXCEPTION, 0);
   }
 }
