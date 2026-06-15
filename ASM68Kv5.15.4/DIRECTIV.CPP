@@ -51,6 +51,7 @@ extern bool pass2, endFlag, listFlag;
 
 extern char *listPtr;	/* Pointer to buffer where listing line is assembled
 			   (Used to put =XXXXXXXX in the listing for EQU's and SET's */
+extern char listData[LIST_DATA_BUFFER_SIZE];
 extern char buffer[256];  //ck used to form messages for display in windows
 
 extern unsigned int startAddress;      // starting address of program
@@ -132,7 +133,6 @@ int org(int size, char *label, char *op, int *errorPtr)
 int section(int size, char *label, char *op, int *errorPtr)
 {
   int value;
-  int newLoc;
   bool backRef = true;
 
   if (size)
@@ -257,7 +257,6 @@ int equ(int size, char *label, char *op, int *errorPtr)
 {
   int value;
   bool backRef;
-  char *op1;
 
   if (size)
     NEWERROR(*errorPtr, INV_SIZE_CODE);
@@ -277,7 +276,7 @@ int equ(int size, char *label, char *op, int *errorPtr)
       }	else {
 	define(label, value, pass2, true, errorPtr);
 	if (pass2 && listFlag && *errorPtr < MINOR) {
-	  sprintf(listPtr, "=%08X ", value); // RA suppress warning on modern 64 bit machines
+	  snprintf(listPtr, sizeof(listData) - (listPtr - listData), "=%08X ", value); // RA suppress warning on modern 64 bit machines
 	  listPtr += 10;
 	}
       }
@@ -320,7 +319,7 @@ int set(int size, char *label, char *op, int *errorPtr)
 	symbol = define(label, value, pass2, false, &error);   // ck 4-18-03
 	symbol->flags |= REDEFINABLE;
 	if (pass2 & listFlag) {
-	  sprintf(listPtr, "=%08X ", value); // supress size warning on 64 bit machines
+	  snprintf(listPtr, sizeof(listData) - (listPtr - listData), "=%08X ", value); // supress size warning on 64 bit machines
 	  listPtr += 10;
 	}
       }
@@ -638,17 +637,12 @@ int opt(int size, char *label, char *op, int *errorPtr)
 // }
 int include(int size, char *label, char *fileName, int *errorPtr)
 {
-  char incLine[256], capLine[256];
+  char capLine[256];
   char *src, *dst;
-  int error, i;
-  int tempFP;                          // temporary File Pointer
-  bool comment;                         // true when line is comment
-  int value;
-  bool backRef;
+  int error;
   FILE *incFile;
   FILE *tmpInFile;                      // save current file
   char quote;
-  int lineNumInc;                       // line number for include file
   int lineNumSave;
   char fileNameSave[256];
 
@@ -757,7 +751,7 @@ int include(int size, char *label, char *fileName, int *errorPtr)
 
   }
   catch( ... ) {
-    sprintf(buffer, "ERROR: An exception occurred in routine 'include'. \n");
+    snprintf(buffer, sizeof(buffer), "ERROR: An exception occurred in routine 'include'. \n");
     printError(NULL, EXCEPTION, 0);
     return SEVERE;
   }
@@ -846,7 +840,7 @@ int incbin(int size, char *label, char *fileName, int *errorPtr)
 
   }
   catch( ... ) {
-    sprintf(buffer, "ERROR: An exception occurred in routine 'incbin'. \n");
+    snprintf(buffer, sizeof(buffer), "ERROR: An exception occurred in routine 'incbin'. \n");
     printError(NULL, EXCEPTION, 0);
     return SEVERE; // RA WAS NULL
   }
@@ -870,7 +864,7 @@ int failError(int size, char *label, char *message, int *errorPtr)
     define(label, loc, pass2, true, errorPtr);
 
   if (!*message)                                // if no message
-    sprintf(buffer, "ERROR: Unspecified user defined error. \n");
+    snprintf(buffer, sizeof(buffer), "ERROR: Unspecified user defined error. \n");
   else {
     strncpy(buffer, message, 254);
     buffer[255] = '\0';

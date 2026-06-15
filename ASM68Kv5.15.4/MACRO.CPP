@@ -104,13 +104,13 @@ int macro(int size, char *label, char *op, int *errorPtr)
   while(fgets(line, 256, inFile)) {
     REMOVECR(line);           // MD Strip out CR here too
     if (pass == 0)
-      fprintf(tmpFile, "%s", line);           // write macro line to tmpFile // RA warning: format not a string literal and no format arguments
+      fprintf(tmpFile, "%s", line);           // write macro line to tmpFile
     lineNum++;
-    tokenize(line, (char *) " \t\n", token, tokens); // RA warning: ISO C++ forbids converting a string constant to ‘char*’
+    tokenize(line, (char *) " \t\n", token, tokens);
     if(!(stricmp(token[1], "MACRO"))) { // if unexpected MACRO opcode
       NEWERROR(*errorPtr, NO_ENDM);     // no ENDM found
       noENDM = true;
-      return SEVERE; // RA NULL
+      return SEVERE;
     }
     if(!(stricmp(token[1], "ENDM")))     // if ENDM opcode
       return NORMAL;
@@ -119,7 +119,7 @@ int macro(int size, char *label, char *op, int *errorPtr)
   }
   NEWERROR(*errorPtr, NO_ENDM);         // no ENDM found
   noENDM = true;
-  return SEVERE; // RA NULL
+  return SEVERE;
 }
 
 
@@ -140,7 +140,6 @@ int asmMacro(int size, char *label, char *arg, int *errorPtr)
   const int MAX_SIZE = 512;       // maximun size of input line
   char *token[MAXT];              // pointers to tokens
   char tokens[MAX_SIZE];          // place tokens here
-  char *tokenEnd[MAXT];           // where tokens end in source line
   int error, argN, i, n;
   int tempFP;                           // temporary File Pointer
   int value;
@@ -152,7 +151,7 @@ int asmMacro(int size, char *label, char *arg, int *errorPtr)
   for (argN=0; argN < MAX_ARGS; argN++) // for all of arguments[] array
     arguments[argN][0] = '\0';
 
-  // *ck 12-6-2005 added following to support size extensions on macro calls.
+  // Added following to support size extensions on macro calls.
   // Argument \0 is reserved for size and defaults to .W
 
   switch (size) {
@@ -274,13 +273,12 @@ int asmMacro(int size, char *label, char *arg, int *errorPtr)
 
   // send each line of macro to assembler
   labelNum++;                           // increment macro label number
-  //itoa(labelNum, labelNumA, 10);        // RAconvert labelNum to string
-  snprintf(labelNumA, 16, "%d", labelNum); // RA
+  snprintf(labelNumA, 16, "%d", labelNum);
   endmFlag = false;
   while(!endmFlag && fgets(line, 256, tmpFile)) {
     REMOVECR(line);
     strcap(capLine, line);
-    tokenize(capLine, (char *)", \t\n", token, tokens); // tokenize line //Ra (char *) to suppress  warning: ISO C++ forbids converting a string constant to ‘char*’
+    tokenize(capLine, (char *)", \t\n", token, tokens); // tokenize line
 
     error = OK;
     skipList = false;
@@ -327,10 +325,8 @@ int asmMacro(int size, char *label, char *arg, int *errorPtr)
                   NEWERROR(error, INVALID_ARG);
               } else
                 NEWERROR(error, SYNTAX);
-            // if NARG opcode
-            //} else if( !(stricmp(token[1], "NARG")) ) {
-            } else if( !(strncasecmp(capL, "NARG", 4)) && !(isalnum(*(capL+4))) ) {   // RA strnicmp
-              sprintf(macL,"%d",argN);
+            } else if( !(strncasecmp(capL, "NARG", 4)) && !(isalnum(*(capL+4))) ) {
+              snprintf(macL, sizeof(macLine) - (macL-macLine),"%d",argN);
               if (argN > 9)
                 macL++;
               macL++;
@@ -347,7 +343,7 @@ int asmMacro(int size, char *label, char *arg, int *errorPtr)
 
     *macL = '\0';
 
-    tempFP = ftell(tmpFile); // save current file position to support nested macros *ck 12-1-2005
+    tempFP = ftell(tmpFile); // save current file position to support nested macros
     continuation = false;
     strcpy(line,macLine);   // replace original source line with macro line
     if (!MEXflag)
@@ -390,7 +386,7 @@ int asmMacro(int size, char *label, char *arg, int *errorPtr)
       assemble(line,&error);    // this supports structured statements in macros
 
     macroFP = tempFP;       // restore macroFP
-    fseek(tmpFile, macroFP, SEEK_SET);      // position tmpFile to previous spot *ck 12-1-2005
+    fseek(tmpFile, macroFP, SEEK_SET);      // position tmpFile to previous spot
 
   } // end while more lines of macro remain
 

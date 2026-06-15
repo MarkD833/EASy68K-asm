@@ -193,12 +193,11 @@ void REMOVECR(char *line)
 int assembleFile(char fileName[], char tempName[], AnsiString workName)
 {
   AnsiString outName;
-  int i;
 
   try {
     tmpFile = fopen(tempName, "w+");
     if (!tmpFile) {
-      sprintf(buffer,"Error creating temp file.");
+      snprintf(buffer, sizeof(buffer),"Error creating temp file.");
 //      Application->MessageBox(buffer, "Error", MB_OK);
       fprintf(stderr,"%s\n",buffer);
       return SEVERE;
@@ -260,7 +259,7 @@ int assembleFile(char fileName[], char tempName[], AnsiString workName)
 //    }
   }
   catch( ... ) {
-    sprintf(buffer, "ERROR: An exception occurred in routine 'assembleFile'. \n");
+    snprintf(buffer, sizeof(buffer), "ERROR: An exception occurred in routine 'assembleFile'. \n");
     printError(NULL, EXCEPTION, 0);
     return 0; // RA
   }
@@ -288,7 +287,7 @@ int strcap(char *d, char *s)
 	*d = '\0';
   }
   catch( ... ) {
-    sprintf(buffer, "ERROR: An exception occurred in routine 'strcap'. \n");
+    snprintf(buffer, sizeof(buffer), "ERROR: An exception occurred in routine 'strcap'. \n");
     printError(NULL, EXCEPTION, 0);
     return 0; // RA
   }
@@ -305,7 +304,7 @@ char *skipSpace(char *p)
 	return p;
   }
   catch( ... ) {
-    sprintf(buffer, "ERROR: An exception occurred in routine 'skipSpace'. \n");
+    snprintf(buffer, sizeof(buffer), "ERROR: An exception occurred in routine 'skipSpace'. \n");
     printError(NULL, EXCEPTION, 0);
     return NULL;
   }
@@ -317,9 +316,6 @@ char *skipSpace(char *p)
 int processFile()
 {
   int error;
-  bool comment;                 // true when line is comment
-  int value;
-  bool backRef;
 
   try {
     offsetMode = false;         // clear flags
@@ -387,7 +383,7 @@ int processFile()
     }
   }
   catch( ... ) {
-    sprintf(buffer, "ERROR: An exception occurred in routine 'processFile'. \n");
+    snprintf(buffer, sizeof(buffer), "ERROR: An exception occurred in routine 'processFile'. \n");
     printError(NULL, EXCEPTION, 0);
     return 0; // RA
   }
@@ -624,7 +620,7 @@ int assemble(char *line, int *errorPtr)
   }
   catch( ... ) {
     NEWERROR(*errorPtr, EXCEPTION);
-    sprintf(buffer, "ERROR: An exception occurred in routine 'assemble'. \n");
+    snprintf(buffer, sizeof(buffer), "ERROR: An exception occurred in routine 'assemble'. \n");
     return 0; // RA
   }
 

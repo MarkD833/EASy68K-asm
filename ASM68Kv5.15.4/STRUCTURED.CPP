@@ -290,10 +290,7 @@ int asmStructure(int size, char *label, char *arg, int *errorPtr)
     char capLine[256];
     char tokenEnd[10];            // last token of structure goes here
     AnsiString stcLabel, stcLabel2, stcLine, sizeStr, extent;
-    symbolDef *symbol;
     int error;
-    int value;
-    bool backRef;
     int n = 2;                    // token index
     int i;
 
